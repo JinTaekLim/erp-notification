@@ -1,6 +1,6 @@
 package com.erp.notification.domain.notification.business;
 
-import com.erp.notification.domain.notification.repository.EmitterRepository;
+import com.erp.notification.domain.cache.CacheRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -9,17 +9,17 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequiredArgsConstructor
 public class SseManager {
 
-  private final EmitterRepository emitterRepository;
+  private final CacheRepository<SseEmitter> cacheRepository;
 
   public SseEmitter getOrSave(String id, SseEmitter emitter) {
-    return emitterRepository.findById(id).orElseGet(() -> {
-      emitterRepository.save(id, emitter);
+    return cacheRepository.get(id).orElseGet(() -> {
+      cacheRepository.save(id, emitter);
       return emitter;
     });
   }
 
   public SseEmitter findById(String id) {
-    return emitterRepository.findById(id).orElseThrow(
+    return cacheRepository.get(id).orElseThrow(
         () -> new RuntimeException("잘못된 연결 요청입니다.")
     );
   }
