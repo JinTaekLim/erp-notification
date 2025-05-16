@@ -1,0 +1,79 @@
+name : Develop PR Merge - CI/CD to Dev Server
+
+# 트리거
+# - develop 브랜치에 PR이 merge 및 close 되었을 때 workflow 동작
+on:
+  pull_request:
+    branches:
+      - dev
+    types:
+      - closed
+
+
+# jobs
+# - workflow 내 단계적으로 처리할 작업
+jobs:
+  ci:
+    # PR이 merge 된 경우에만 동작하도록 조건 명시
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest # 최신 Ubuntu 러너에 의해 동작
+    environment: develop # develop 환경 변수설정 사용
+    steps:
+      # 레포지토리의 코드를 러너 안에서 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # temurin 배포판을 사용하여 JDK 17 설정
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      # src/main/resources에 application-secret.yml 파일 생성
+      - name: Create application-secret.yml
+        run: |
+          mkdir -p src/main/resources
+          echo "${{secrets.SECRET_YML}}" > src/main/resources/application-secret.yml
+
+      # gradlew 스크립트 실행 권한 부여
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # gradle 빌드 및 테스트
+      - name: Build and test with gradle
+        run: ./gradlew clean build
+
+cd:
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Connect deploy key
+      uses: cloudtype-github-actions/connect@v1
+      with:
+        token: ${{ secrets.CLOUDTYPE_TOKEN }}
+        ghtoken: ${{ secrets.GHP_TOKEN }}
+
+    - name: Deploy
+      uses: cloudtype-github-actions/deploy@v1
+      with:
+        token: ${{ secrets.CLOUDTYPE_TOKEN }}
+        project: jintaek019/yeohaenghama-backend
+        stage: main
+        yaml: |
+          name: erp-notification
+          app: dockerfile
+          options:
+            ports: 8080
+            dockerfile: Dockerfile
+            env: []
+            args: []
+            commands: ""
+          context:
+            git:
+              url: git@github.com:${{ github.repository }}.git
+              ref: ${{ github.ref }}
+          preset: dockerfile-java
+
