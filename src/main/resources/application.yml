@@ -1,3 +1,9 @@
 spring:
   application:
     name: notification
+  profiles:
+    active: local
+
+
+server:
+  port: 9000
