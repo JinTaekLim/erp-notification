@@ -44,36 +44,36 @@ jobs:
       - name: Build and test with gradle
         run: ./gradlew clean build
 
-cd:
-  runs-on: ubuntu-latest
-  steps:
-    - name: Checkout
-      uses: actions/checkout@v2
 
-    - name: Connect deploy key
-      uses: cloudtype-github-actions/connect@v1
-      with:
-        token: ${{ secrets.CLOUDTYPE_TOKEN }}
-        ghtoken: ${{ secrets.GHP_TOKEN }}
+  cd:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Deploy
-      uses: cloudtype-github-actions/deploy@v1
-      with:
-        token: ${{ secrets.CLOUDTYPE_TOKEN }}
-        project: jintaek019/yeohaenghama-backend
-        stage: main
-        yaml: |
-          name: erp-notification
-          app: dockerfile
-          options:
-            ports: 8080
-            dockerfile: Dockerfile
-            env: []
-            args: []
-            commands: ""
-          context:
-            git:
-              url: git@github.com:${{ github.repository }}.git
-              ref: ${{ github.ref }}
-          preset: dockerfile-java
+      - name: Connect deploy key
+        uses: cloudtype-github-actions/connect@v1
+        with:
+          token: ${{ secrets.CLOUDTYPE_TOKEN }}
+          ghtoken: ${{ secrets.GHP_TOKEN }}
 
+      - name: Deploy
+        uses: cloudtype-github-actions/deploy@v1
+        with:
+          token: ${{ secrets.CLOUDTYPE_TOKEN }}
+          project: jintaek019/yeohaenghama-backend
+          stage: main
+          yaml: |
+            name: erp-notification
+            app: dockerfile
+            options:
+              ports: 8080
+              dockerfile: Dockerfile
+              env: []
+              args: []
+              commands: ""
+            context:
+              git:
+                url: git@github.com:${{ github.repository }}.git
+                ref: ${{ github.ref }}
+            preset: dockerfile-java
