@@ -4,6 +4,7 @@ import com.erp.notification.domain.cache.CacheRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 
 @Component
 @RequiredArgsConstructor
@@ -25,6 +26,14 @@ public class SseManager {
   }
 
   public void send(SseEmitter emitter, String message) {
+    try {
+      emitter.send(message);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void send(SseEmitter emitter, SseEventBuilder message) {
     try {
       emitter.send(message);
     } catch (Exception e) {
