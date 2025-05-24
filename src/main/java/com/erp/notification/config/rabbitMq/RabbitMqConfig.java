@@ -1,6 +1,8 @@
 package com.erp.notification.config.rabbitMq;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -23,7 +25,10 @@ public class RabbitMqConfig {
 
   @Bean
   public Declarables rabbitDeclarables() {
-    List<Declarable> declarable = rabbitMqProperties.getQueues().stream()
+    List<Declarable> declarable = Optional.ofNullable(rabbitMqProperties)
+        .map(RabbitMqProperties::getQueues)
+        .stream()
+        .flatMap(Collection::stream)
         .flatMap(q -> q.getName().stream()
             .map(queueName -> createQueueAndBinding(q.getExchange(), queueName)))
         .flatMap(List::stream)
