@@ -51,6 +51,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Write deploy yaml file
+        run: echo "${{ secrets.CLOUDTYPE_DEV_DEPLOY }}" > deploy.yaml
+
       - name: Connect deploy key
         uses: cloudtype-github-actions/connect@v1
         with:
@@ -63,17 +66,4 @@ jobs:
           token: ${{ secrets.CLOUDTYPE_TOKEN }}
           project: jintaek019/yeohaenghama-backend
           stage: main
-          yaml: |
-            name: erp-notification
-            app: dockerfile
-            options:
-              ports: 8080
-              dockerfile: Dockerfile
-              env: []
-              args: []
-              commands: ""
-            context:
-              git:
-                url: git@github.com:${{ github.repository }}.git
-                ref: ${{ github.ref }}
-            preset: dockerfile-java
+          yaml: ./deploy.yaml
