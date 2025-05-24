@@ -1,7 +1,6 @@
 package com.erp.notification.domain.owner.service;
 
-import com.erp.notification.domain.notification.business.SseManager;
-import com.erp.notification.domain.owner.support.OwnerSseFactory;
+import com.erp.notification.domain.owner.business.OwnerSseManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -10,19 +9,14 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequiredArgsConstructor
 public class OwnerService {
 
-  private final SseManager sseManager;
-
-  private final OwnerSseFactory ownerSseFactory = new OwnerSseFactory();
+  private final OwnerSseManager ownerSseManager;
 
   public SseEmitter connect(String id) {
-    String key = ownerSseFactory.getKey(id);
-    SseEmitter emitter = ownerSseFactory.getEmitter();
-    return sseManager.getOrSave(key, emitter);
+    return ownerSseManager.getOrSave(id);
   }
 
   public void send(String id, String message) {
-    String key = ownerSseFactory.getKey(id);
-    SseEmitter emitter = sseManager.findById(key);
-    sseManager.send(emitter, message);
+    ownerSseManager.send(id, message);
   }
+
 }
